@@ -1,26 +1,36 @@
-import { heroi, listasTodos} from "../repository/HeroitRepository.js";
+import {adicionar, listadeHerois} from '../repository/HeroiRepository.js'
+import { Router } from 'express'
+const server=Router();
 
-import { Router } from "express";
-const server= Router();
-
-server.post ('/Heroi', async (req,resp) =>{
+server.post('/heroi' , async (req, resp) => {
     try {
-        const Heroi= req.body;
-        if(!Heroi.nome)
-        throw new Error('nome do heroi obrigatorio!');
-        const Heroi = await  heroi(Heroi);
-    }catch(err){
-        resp.status(400).send({erro:err.message})
+        const infoHero = req.body;
+
+        if (!infoHero.nome)
+            throw new Error('Nome do herói é obrigatório!');
+        
+        if (!infoHero.poder)
+            throw new Error('Descrição do herói é obrigatória!');
+        
+        if (infoHero.voa == undefined || infoHero.voa < 0)
+            throw new Error('Informe se o herói voa ou não!');
+
+        const addHero = await adicionar (infoHero);
+        resp.send(addHero);
+
+    } catch (err) {
+        resp.status(400).send({erro:err.message});
     }
 })
 
-server.get('/Heroi',async (req,resp)=>{
-    try{
-        const ChecarTodos=await  listasTodos();
-        resp.send ( listasTodos);
-    
-    }catch (err){
-        resp.status(400).send ({erro:'Deu Erro!'});
+server.get('/heroi' , async (req, resp) => {
+    try {
+        const resposta = await listadeHerois();
+        resp.send(resposta);
+    } catch (err) {
+        resp.status(400).send({
+            erro:err.message
+        });
     }
 })
 
